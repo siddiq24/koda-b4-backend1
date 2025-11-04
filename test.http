@@ -1,0 +1,25 @@
+@BASE_URL=http://localhost:8081
+
+GET {{BASE_URL}}/users
+
+###
+GET {{BASE_URL}}/users/4
+
+###
+POST  {{BASE_URL}}/users
+Content-Type: application/json
+
+{
+    "nama" : "Ucup"
+}
+
+###
+PATCH  {{BASE_URL}}/users/4
+Content-Type: application/json
+
+{
+    "nama": "Rembulan"
+}
+
+###
+DELETE  {{BASE_URL}}/users/4
