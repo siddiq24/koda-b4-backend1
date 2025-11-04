@@ -3,23 +3,25 @@
 GET {{BASE_URL}}/users
 
 ###
-GET {{BASE_URL}}/users/4
+GET {{BASE_URL}}/users/333
+
 
 ###
 POST  {{BASE_URL}}/users
 Content-Type: application/json
 
 {
-    "nama" : "Ucup"
+    "id": 8,
+    "nama" : "Ucup2"
 }
 
 ###
-PATCH  {{BASE_URL}}/users/4
+PATCH  {{BASE_URL}}/users/8
 Content-Type: application/json
 
 {
-    "nama": "Rembulan"
+    "nama": "Rembulan Malam"
 }
 
 ###
-DELETE  {{BASE_URL}}/users/4
+DELETE  {{BASE_URL}}/users/8

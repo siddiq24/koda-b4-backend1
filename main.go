@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +13,8 @@ type Ressponse struct {
 }
 
 type User struct {
-	Id   int    `json:"id"`
-	Nama string `json:"nama"`
+	Id   int    `json:"id" validate:"gt"`
+	Nama string `json:"nama" validate:"required,min=3,max=20"`
 }
 
 var Users []User = []User{
@@ -56,21 +55,36 @@ func main() {
 	})
 
 	r.GET("users/:id", func(ctx *gin.Context) {
-		id := 0
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(400, Ressponse{
+				Success: false,
+				Massage: "id tidak valid",
+			})
+			return
+		}
 		for i, user := range Users {
-			if ctx.Param("id") == fmt.Sprint(user.Id) {
-				id = i
+			if id == user.Id {
+				ctx.JSON(200, Ressponse{
+					Success: true,
+					Data:    Users[i],
+				})
+				return
+			}
+			if i == (len(Users)-1){
+				ctx.JSON(400, Ressponse{
+					Success: false,
+					Massage: "user not found!",
+				})
+				return
 			}
 		}
-		ctx.JSON(200, Ressponse{
-			Success: true,
-			Data:    Users[id],
-		})
+
 	})
 
 	r.POST("/users", func(ctx *gin.Context) {
-		var user User
-		err := ctx.ShouldBindJSON(&user)
+		var newuser User
+		err := ctx.ShouldBindJSON(&newuser)
 		if err != nil {
 			ctx.JSON(400, Ressponse{
 				Success: false,
@@ -79,9 +93,19 @@ func main() {
 			return
 		}
 
-		user.Id = len(Users)
+		for i, user := range Users {
+			if newuser.Id == user.Id || newuser.Nama == user.Nama {
+				ctx.JSON(200, Ressponse{
+					Success: false,
+					Massage: "Id or user is exist",
+					Data:    Users[i],
+				})
+				return
+			}
+		}
+		Users = append(Users, newuser)
 
-		Users = append(Users, user)
+
 		ctx.JSON(200, Ressponse{
 			Success: true,
 			Massage: "Berhasil Menambahkan User",
@@ -94,7 +118,7 @@ func main() {
 		if err != nil {
 			ctx.JSON(400, Ressponse{
 				Success: false,
-				Massage: "gagal mengambil param",
+				Massage: "param tidak valid",
 			})
 			return
 		}
@@ -120,7 +144,7 @@ func main() {
 					Massage: "berhasil mengupdate user",
 					Data: Users,
 				})
-				break
+				return
 			}
 			if i == (len(Users)-1){
 				ctx.JSON(400, Ressponse{
