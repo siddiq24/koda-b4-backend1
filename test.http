@@ -3,7 +3,7 @@
 GET {{BASE_URL}}/users
 
 ###
-GET {{BASE_URL}}/users/333
+GET {{BASE_URL}}/users/4
 
 
 ###
@@ -11,17 +11,43 @@ POST  {{BASE_URL}}/users
 Content-Type: application/json
 
 {
-    "id": 8,
-    "nama" : "Ucup2"
+    "nama" : "Ucuuup",
+    "email": "ucup@mail.come",
+    "password": "Ucup12345"
 }
 
 ###
-PATCH  {{BASE_URL}}/users/8
+PATCH  {{BASE_URL}}/users/7
 Content-Type: application/json
 
 {
-    "nama": "Rembulan Malam"
+    "nama": "Rembulan Malam2",
+    "email": "ucup@mail.com",
+    "password": "Ucup12345"
 }
 
 ###
-DELETE  {{BASE_URL}}/users/8
+DELETE  {{BASE_URL}}/users/7
+
+###
+POST  {{BASE_URL}}/auth/register
+Content-Type: application/json
+
+{
+    "id": 3,
+    "nama": "Rembulan Malam2",
+    "email": "ucup@mail.com",
+    "password": "Ucup12345"
+}
+
+###
+POST {{BASE_URL}}/auth/register
+Content-Type: application/x-www-form-urlencoded
+
+email=fikki@gmail.coma&id=1&password=1234567890
+
+###
+POST {{BASE_URL}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+email=fikki@gmail.coma&id=1&password=1234567890
