@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/siddiq24/golang-gin/configs"
 	"github.com/siddiq24/golang-gin/middlewares"
 	"github.com/siddiq24/golang-gin/routers"
@@ -14,10 +18,12 @@ type Ressponse struct {
 }
 
 func main() {
+	godotenv.Load()
 	db := configs.InitDb()
 
 	r := gin.Default()
 	r.Use(middlewares.InitCorsMiddleware())
 	routers.InitRouter(r, db)
-	r.Run(":8081")
+	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	r.Run(port)
 }
