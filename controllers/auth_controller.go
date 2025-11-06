@@ -17,6 +17,18 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 	}
 }
 
+// Register godoc
+// @Sumary 				Register for new user
+// @Description 		Create a new user
+// @Tags				Auth
+// @Accept				x-www-form-urlencoded
+// @Produce 			json
+// @Param 				nama		formData	string	true "User Name"
+// @Param				email		formData	string	true "User Email"
+// @Param				password	formData	string	true "User Password"
+// @Success 			200	{object}	models.Ressponse
+// @Failur				400 {object}	models.Ressponse
+// @Router				/auth/register	[post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	req := dto.Register_Request{
 		Nama:     ctx.PostForm("nama"),
@@ -42,7 +54,17 @@ func (c *AuthController) Register(ctx *gin.Context) {
 	})
 }
 
-
+// Login godoc
+// @Sumary				Login User
+// @Description 		Authenticate user using email and password
+// @Tags				Auth
+// @Accept				x-www-form-urlencoded
+// @Produce				json
+// @Param				email		formData	string	true	"User Email"
+// @Param				password	formData	string	true	"User Password"
+// @Success				200 {object}	models.Ressponse
+// @Failur				400	{object}	models.Ressponse
+// @Router				/auth/login	[post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	req := models.User{
 		Nama:     ctx.PostForm("nama"),
