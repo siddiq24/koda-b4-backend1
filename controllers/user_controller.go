@@ -2,10 +2,17 @@ package controllers
 
 import (
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
 	"math"
+	"os"
+	"path/filepath"
 	"strconv"
 
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	"github.com/siddiq24/golang-gin/models"
 	"github.com/siddiq24/golang-gin/services"
@@ -206,14 +213,14 @@ func (u *UserController) CreateUser(c *gin.Context) {
 // @Tags         users
 // @Accept       x-www-form-urlencoded
 // @Produce      json
-// @Param        id        path      int     true   "User ID"
-// @Param        name      formData  string  true   "User name"        minlength(3)
-// @Param        email     formData  string  true   "User email"       format(email)
-// @Param        password  formData  string  false  "User password"    minlength(6)
-// @Param        age       formData  int     false  "User age"         minimum(0)  maximum(150)
-// @Success      200       {object}  models.Ressponse{data=models.User}  "User updated successfully"
-// @Failure      400       {object}  models.Ressponse  "Bad request - invalid ID or validation error"
-// @Router       /users/{id} [put]
+// @Param        id        	path      int     true   "User ID"
+// @Param        nama      	formData  string  true   "User name"        minlength(3)
+// @Param        email     	formData  string  true   "User email"       format(email)
+// @Param        password  	formData  string  false  "User password"    minlength(6)
+// @Param        image		formData  file    false  "User picture"
+// @Success      200       	{object}  models.Ressponse{data=models.User}  "User updated successfully"
+// @Failure      400       	{object}  models.Ressponse  "Bad request - invalid ID or validation error"
+// @Router       /users/{id} [patch]
 func (u *UserController) UpdateUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -227,7 +234,29 @@ func (u *UserController) UpdateUser(c *gin.Context) {
 	nama := c.PostForm("nama")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
-	ageStr := c.DefaultPostForm("age", "0")
+	var filename string
+	file, header, err := c.Request.FormFile("image")
+	if err == nil {
+		defer file.Close()
+
+		img, _, err := image.Decode(file)
+		if err != nil {
+			c.JSON(400, models.Ressponse{Success: false, Massage: "file bukan gambar valid"})
+			return
+		}
+
+		fileExt := filepath.Ext(header.Filename)
+		filename = fmt.Sprintf("%s%s", nama, fileExt)
+		os.MkdirAll("images/user", os.ModePerm)
+
+		localPath := fmt.Sprintf("images/user/%s", filename)
+
+		resized := imaging.Resize(img, 1000, 0, imaging.Lanczos)
+		if err := imaging.Save(resized, localPath); err != nil {
+			c.JSON(400, models.Ressponse{Success: false, Massage: "gagal menyimpan gambar"})
+			return
+		}
+	}
 
 	if nama == "" {
 		c.JSON(400, models.Ressponse{
@@ -261,28 +290,12 @@ func (u *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	age, err := strconv.Atoi(ageStr)
-	if err != nil {
-		c.JSON(400, models.Ressponse{
-			Success: false,
-			Massage: "age harus berupa angka",
-		})
-		return
-	}
-
-	if age < 0 || age > 150 {
-		c.JSON(400, models.Ressponse{
-			Success: false,
-			Massage: "age tidak valid",
-		})
-		return
-	}
-
 	newUser := models.User{
-		Id:       id,
-		Nama:     nama,
-		Email:    email,
-		Password: password,
+		Id:          id,
+		Nama:        nama,
+		Email:       email,
+		Password:    password,
+		ProfilePict: filename,
 	}
 
 	err = u.Service.UpdateUser(&newUser)
