@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/siddiq24/golang-gin/controllers"
+	"github.com/siddiq24/golang-gin/middlewares"
 	"github.com/siddiq24/golang-gin/models"
 	"github.com/siddiq24/golang-gin/repositories"
 	"github.com/siddiq24/golang-gin/services"
@@ -14,6 +15,7 @@ func InitUserRouter(r *gin.Engine, users *[]models.User) {
 	userController := controllers.NewUserController(userService)
 
 	usersRouter := r.Group("/users")
+	usersRouter.Use(middlewares.AuthMiddleware())
 	{
 		usersRouter.GET("", userController.GetAllUsers)
 		usersRouter.GET("/:id", userController.GetUserById)
